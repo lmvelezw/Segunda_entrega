@@ -1,0 +1,37 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Products</title>
+  </head>
+  <body>
+
+    <h1>Products</h1>
+
+    {{#each productsInfo}}
+      <div class="product">
+        <ul>
+
+          <h2>{{this.title}}</h2>
+          <li>{{this.description}}</li>
+          <li>{{this.code}}</li>
+          <li>{{this.price}}</li>
+          <li>{{this.category}}</li>
+          <p>Price: ${{this.price}}</p>
+        </ul>
+
+        <form action="/cart/:cid/product/:pid" method="put">
+          <input type="number" name="quantity" value="1" />
+          <button type="submit" id="addProduct">Agregar al carrito</button>
+        </form>
+
+
+      </div>
+    {{/each}}
+
+    {{#if productDocs.hasNextPage}}
+      <a href="?page={{productDocs.nextPage}}">Next Page</a>
+    {{/if}}
+
+  </body>
+</html>
