@@ -1,8 +1,31 @@
 import { Router } from "express";
 import productModel from "../models/products.model.js";
+import handlebars from "handlebars";
+import { URLSearchParams } from "url";
 
 const ProductRouter = Router();
 
+handlebars.registerHelper("generateNextPageLink", (query, nextPage) => {
+  const queryParams = new URLSearchParams(query);
+  const existingParams = Array.from(queryParams.entries());
+  existingParams.forEach(([key, value]) => {
+    queryParams.set(key, value);
+  });
+  queryParams.set("page", nextPage);
+  return queryParams.toString();
+});
+handlebars.registerHelper("generatePrevPageLink", (query, prevPage) => {
+  const queryParams = new URLSearchParams(query);
+
+  const existingParams = Array.from(queryParams.entries());
+  existingParams.forEach(([key, value]) => {
+    queryParams.set(key, value);
+  });
+
+  queryParams.set("page", prevPage);
+
+  return queryParams.toString();
+});
 
 // http://localhost:8080/api/products?category=Mesa&limit=1&sort=asc&page=2
 ProductRouter.get("/", async (req, res) => {
@@ -33,12 +56,18 @@ ProductRouter.get("/", async (req, res) => {
     console.log(productsToShow.docs);
     console.log(productsToShow);
 
-    const productsInfo = productsToShow.docs.map(doc => doc.toObject())
+    const productsInfo = {
+      docs: productsToShow.docs.map((doc) => doc.toObject()),
+      hasNextPage: productsToShow.hasNextPage,
+      nextPage: productsToShow.nextPage,
+      hasPrevPage: productsToShow.hasPrevPage,
+      prevPage: productsToShow.prevPage,
+    };
 
     res.render("home", {
       productsInfo,
-    })
-
+      query: req.query,
+    });
   } catch (error) {
     console.log("err", error);
     res.status(500).send("Server Error");

@@ -8,7 +8,7 @@
 
     <h1>Products</h1>
 
-    {{#each productsInfo}}
+    {{#each productsInfo.docs}}
       <div class="product">
         <ul>
 
@@ -25,13 +25,16 @@
           <button type="submit" id="addProduct">Agregar al carrito</button>
         </form>
 
-
       </div>
+
     {{/each}}
 
-    {{#if productDocs.hasNextPage}}
-      <a href="?page={{productDocs.nextPage}}">Next Page</a>
-    {{/if}}
+{{#if productsInfo.hasPrevPage}}
+  <a href="/api/products?{{generatePrevPageLink query productsInfo.prevPage}}">Previous Page</a>
+{{/if}}
+{{#if productsInfo.hasNextPage}}
+  <a href="/api/products?{{generateNextPageLink query productsInfo.nextPage}}">Next Page</a>
+{{/if}}
 
   </body>
 </html>
