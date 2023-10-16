@@ -53,9 +53,6 @@ ProductRouter.get("/", async (req, res) => {
 
     let productsToShow = await productModel.paginate(query, options);
 
-    console.log(productsToShow.docs);
-    console.log(productsToShow);
-
     const productsInfo = {
       docs: productsToShow.docs.map((doc) => doc.toObject()),
       hasNextPage: productsToShow.hasNextPage,
@@ -63,10 +60,13 @@ ProductRouter.get("/", async (req, res) => {
       hasPrevPage: productsToShow.hasPrevPage,
       prevPage: productsToShow.prevPage,
     };
+    const user = req.session.user || null;
+
 
     res.render("home", {
       productsInfo,
       query: req.query,
+      user: user,
     });
   } catch (error) {
     console.log("err", error);

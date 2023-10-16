@@ -2,12 +2,20 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Products</title>
+    <title>Home</title>
   </head>
   <body>
-  <h1>Segunda entrega</h1>
+    
+    {{#if user}}
+    <p>Hola, {{user.first_name}} {{user.last_name}}</p>
+      {{>profile}}
+    {{else}}
+      <a href="/api/sessions/login">Log In to buy</a>
+      <a href="/api/sessions/register">Register</a>
+    {{/if}}
 
-  {{>products}}
+
+    {{>products}}
    
 
   </body>

@@ -1,0 +1,27 @@
+<h2>Subscribe here</h2>
+
+<form method="POST" action="/api/sessions/register">
+  <label for="first_name">First name</label>
+  <input type="text" name="first_name" />
+
+  <label for="last_name">Last name</label>
+  <input type="text" name="last_name" />
+
+  <label for="email">Email</label>
+  <input type="email" name="email" />
+
+  <label for="age">Age</label>
+  <input type="number" name="age" />
+
+  <label for="password">Password</label>
+  <input type="password" name="password" />
+
+  <label for="role">Role</label>
+  <select name="role" id="role">
+    <option value="user" selected>User</option>
+    <option value="admin">Admin</option>
+  </select>
+
+  <button type="submit">Sign In</button>
+  <a href="/api/sessions/login">Log In</a>
+</form>
