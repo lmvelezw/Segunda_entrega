@@ -1,5 +1,6 @@
 import { Router } from "express";
 import usersModel from "../models/users.model.js";
+import { createHash, isValidPassword } from "../utils.js";
 
 const sessionRouter = Router();
 
@@ -26,7 +27,7 @@ sessionRouter.post("/register", async (req, res) => {
       last_name,
       email,
       age,
-      password,
+      password: createHash(password),
       role,
     });
 
@@ -44,15 +45,24 @@ sessionRouter.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const user = await usersModel.findOne({ email, password });
+    if (!email || !password)
+      return res
+        .status(400)
+        .send({ status: "error", error: "Incomplete values" });
 
-    if (user) {
-      req.session.user = user.toObject();
-      console.log(req.session.user);
-      res.redirect("/api/products");
-    } else {
-      res.redirect("/api/sessions/register");
-    }
+    const user = await usersModel.findOne(
+      { email: email },
+      { email: 1, first_name: 1, last_name: 1, password: 1, role:1 }
+    );
+    if (!user)
+      res.status(400).send({ status: "error", error: "User not found" });
+    if (!isValidPassword(user, password))
+      return res
+        .status(403)
+        .send({ status: "error", error: "Incorrect password" });
+    delete user.password;
+    req.session.user = user.toObject();
+    res.redirect("/api/products");
   } catch (error) {
     console.log("Error:", error);
     res.status(500).send("Server Error");
@@ -79,7 +89,5 @@ sessionRouter.get("/fullprofile", async (req, res) => {
     res.status(500).send("Server Error");
   }
 });
-
-
 
 export default sessionRouter;
