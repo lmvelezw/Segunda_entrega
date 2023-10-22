@@ -7,6 +7,9 @@ import session from "express-session";
 import MongoStore from "connect-mongo";
 import FileStore from "session-file-store";
 import { config } from "dotenv";
+import passport from "passport";
+import initializePassport from "./config/passport.config.js";
+import Swal from "sweetalert2";
 
 import ProductRouter from "./router/product.routes.js";
 import cartRouter from "./router/cart.routes.js";
@@ -62,6 +65,11 @@ app.use(
     saveUninitialized: false,
   })
 );
+
+// Passport
+initializePassport()
+app.use(passport.initialize())
+app.use(passport.session())
 
 environment();
 // Routes

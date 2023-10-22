@@ -1,6 +1,6 @@
 import { Router } from "express";
 import usersModel from "../models/users.model.js";
-import { createHash, isValidPassword } from "../utils.js";
+import passport from "passport";
 
 const sessionRouter = Router();
 
@@ -15,59 +15,40 @@ sessionRouter.get("/register", async (req, res) => {
   res.render("register");
 });
 
-sessionRouter.post("/register", async (req, res) => {
-  let { first_name, last_name, email, age, password, role } = req.body;
-  try {
-    if (!first_name || !last_name || !email || !age || !password || !role) {
-      res.send({ status: "error", error: "Incomplete data" });
-    }
+sessionRouter.post(
+  "/register",
+  passport.authenticate("register", {
+    successRedirect: "/api/sessions/login",
+    failureRedirect: "/failregister",
+  })
+);
 
-    await usersModel.create({
-      first_name,
-      last_name,
-      email,
-      age,
-      password: createHash(password),
-      role,
-    });
-
-    res.redirect("/api/sessions/login");
-  } catch (error) {
-    res.status(500).send("Error de registro");
-  }
+sessionRouter.get("/failregister", async (req, res) => {
+  console.log("Failed Strategy");
+  res.send({ error: "Failed" });
 });
 
 sessionRouter.get("/login", async (req, res) => {
   res.render("login");
 });
 
-sessionRouter.post("/login", async (req, res) => {
-  const { email, password } = req.body;
-
-  try {
-    if (!email || !password)
-      return res
-        .status(400)
-        .send({ status: "error", error: "Incomplete values" });
-
-    const user = await usersModel.findOne(
-      { email: email },
-      { email: 1, first_name: 1, last_name: 1, password: 1, role:1 }
-    );
-    if (!user)
-      res.status(400).send({ status: "error", error: "User not found" });
-    if (!isValidPassword(user, password))
-      return res
-        .status(403)
-        .send({ status: "error", error: "Incorrect password" });
-    delete user.password;
-    req.session.user = user.toObject();
+sessionRouter.post(
+  "/login",
+  passport.authenticate("login", { failureRedirect: "/api/sessions/login" }),
+  async (req, res) => {
+    if (!req.user) {
+      return res.status(400)({ status: "error", error: "Invalid credentials" });
+    }
+    req.session.user = {
+      first_name: req.user.first_name,
+      last_name: req.user.last_name,
+      age: req.user.age,
+      email: req.user.email,
+      role: req.user.role,
+    };
     res.redirect("/api/products");
-  } catch (error) {
-    console.log("Error:", error);
-    res.status(500).send("Server Error");
   }
-});
+);
 
 sessionRouter.get("/logout", async (req, res) => {
   delete req.session.user;
@@ -89,5 +70,20 @@ sessionRouter.get("/fullprofile", async (req, res) => {
     res.status(500).send("Server Error");
   }
 });
+
+sessionRouter.get(
+  "/github",
+  passport.authenticate("github", { scope: ["user:email"] }),
+  async (req, res) => {}
+);
+
+sessionRouter.get(
+  "/githubcallback",
+  passport.authenticate("github", { failureRedirect: "/api/sessions/login" }),
+  async (req, res) => {
+    req.session.user = req.user;
+    res.redirect("/api/products");
+  }
+);
 
 export default sessionRouter;
