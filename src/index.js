@@ -60,8 +60,8 @@ app.use(
       mongoOptions: { useNewUrlParser: true, useUnifiedTopology: true },
       ttl: 1000,
     }),
-    secret: "coderhouse",
-    resave: false,
+    secret: process.env.SESSION_SECRET,
+    resave: true,
     saveUninitialized: false,
   })
 );

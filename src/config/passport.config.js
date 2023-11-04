@@ -1,8 +1,12 @@
 import passport from "passport";
 import local from "passport-local";
 import userModel from "../models/users.model.js";
-import { createHash, isValidPassword } from "../utils.js";
+import {
+  createHash,
+  isValidPassword,
+} from "../utils.js";
 import GitHubStrategy from "passport-github2";
+import cartsModel from "../models/carts.model.js";
 
 const LocalStrategy = local.Strategy;
 const initializePassport = () => {
@@ -24,8 +28,14 @@ const initializePassport = () => {
             age,
             role,
             password: createHash(password),
+            cart: null,
           };
           let result = await userModel.create(newUser);
+
+          let newCart = await cartsModel.create({});
+          result.cart = newCart._id;
+          await result.save();
+
           return done(null, result);
         } catch (error) {
           return done("Error getting user: " + error);
@@ -54,6 +64,13 @@ const initializePassport = () => {
           }
           if (!isValidPassword(user, password))
             return done(null, false, { message: "Incorrect password" });
+
+          if (!user.cart) {
+            let newCart = await cartsModel.create({});
+            user.cart = newCart._id;
+            await user.save();
+          }
+
           return done(null, user);
         } catch (error) {
           return done(error);
@@ -61,6 +78,8 @@ const initializePassport = () => {
       }
     )
   );
+
+
   passport.use(
     "github",
     new GitHubStrategy(
@@ -80,11 +99,22 @@ const initializePassport = () => {
               email: profile._json.email,
               age: 18,
               password: "",
-              role:"user"
+              role: "user",
+              cart: "",
             };
             let result = await userModel.create(newUser);
+
+            let newCart = await cartsModel.create({});
+            result.cart = newCart._id;
+            await result.save();
+
             done(null, result);
           } else {
+            if (!user.cart) {
+              let newCart = await cartsModel.create({});
+              user.cart = newCart._id;
+              await user.save();
+            }
             done(null, user);
           }
         } catch (error) {

@@ -1,30 +1,34 @@
+<div class="formsContainer">
 <h2>Subscribe here</h2>
 
-<form method="POST" action="/api/sessions/register">
+<form class="form" method="POST" action="/api/sessions/register">
   <label for="first_name">First name</label>
-  <input type="text" name="first_name" />
+  <input class="input" type="text" name="first_name" />
 
   <label for="last_name">Last name</label>
-  <input type="text" name="last_name" />
+  <input class="input" type="text" name="last_name" />
 
   <label for="email">Email</label>
-  <input type="email" name="email" />
+  <input class="input" type="email" name="email" />
 
   <label for="age">Age</label>
-  <input type="number" name="age" />
+  <input class="input" type="number" name="age" />
 
   <label for="password">Password</label>
-  <input type="password" name="password" />
+  <input class="input" type="password" name="password" />
 
   <label for="role">Role</label>
-  <select name="role" id="role">
+  <select class="input" name="role" id="role">
     <option value="user" selected>User</option>
     <option value="admin">Admin</option>
   </select>
 
-  <button type="submit">Create account</button>
+  <button class="btn btnproceed" type="submit">Create account</button>
+  <div class="btnBox">
   <p>Already user?</p>
-  <button><a href="/api/sessions/login">Log In</a></button>
-  <button><a href="/api/sessions/github">Log in with GitHub</a></button>
+  <button class="btn"><a href="/api/sessions/login">Log In</a></button>
+  <button class="btn"><a href="/api/sessions/github">Log in with GitHub</a></button>
+  </div>
   
 </form>
+</div>

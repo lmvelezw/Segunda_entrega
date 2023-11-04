@@ -19,13 +19,12 @@ sessionRouter.post(
   "/register",
   passport.authenticate("register", {
     successRedirect: "/api/sessions/login",
-    failureRedirect: "/failregister",
+    failureRedirect: "/api/sessions/failregister",
   })
 );
 
 sessionRouter.get("/failregister", async (req, res) => {
-  console.log("Failed Strategy");
-  res.send({ error: "Failed" });
+  res.render("failregister")
 });
 
 sessionRouter.get("/login", async (req, res) => {
