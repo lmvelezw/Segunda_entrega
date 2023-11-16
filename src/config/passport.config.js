@@ -1,12 +1,10 @@
 import passport from "passport";
 import local from "passport-local";
-import userModel from "../models/users.model.js";
-import {
-  createHash,
-  isValidPassword,
-} from "../utils.js";
+import userModel from "../dao/models/users.model.js";
+import config from "./config.js";
+import { createHash, isValidPassword } from "../utils.js";
 import GitHubStrategy from "passport-github2";
-import cartsModel from "../models/carts.model.js";
+import cartsModel from "../dao/models/carts.model.js";
 
 const LocalStrategy = local.Strategy;
 const initializePassport = () => {
@@ -79,19 +77,19 @@ const initializePassport = () => {
     )
   );
 
-
   passport.use(
     "github",
     new GitHubStrategy(
       {
-        clientID: process.env.GITHUB_CLIENT_ID,
-        clientSecret: process.env.GITHUB_SECRET,
-        callbackURL: "http://localhost:8080/api/sessions/githubcallback",
+        clientID: config.githubClient,
+        clientSecret: config.githubSecret,
+        callbackURL: config.githubCallback,
       },
       async (accessToken, refreshToken, profile, done) => {
         try {
-          console.log(profile);
+          // console.log(profile);
           let user = await userModel.findOne({ email: profile._json.email });
+          // console.log(user)
           if (!user) {
             let newUser = {
               first_name: profile._json.name,
@@ -100,22 +98,26 @@ const initializePassport = () => {
               age: 18,
               password: "",
               role: "user",
-              cart: "",
             };
-            let result = await userModel.create(newUser);
+            // let result = await userModel.create(newUser);
+
+            let result = await userModel.create(newUser).catch((error) => {
+              console.error("Validation error:", error);
+              return done(error);
+            });
 
             let newCart = await cartsModel.create({});
             result.cart = newCart._id;
             await result.save();
 
-            done(null, result);
+            return done(null, result);
           } else {
             if (!user.cart) {
               let newCart = await cartsModel.create({});
               user.cart = newCart._id;
               await user.save();
             }
-            done(null, user);
+            return done(null, user);
           }
         } catch (error) {
           return done(error);

@@ -1,7 +1,9 @@
 import { Router } from "express";
-import usersModel from "../models/users.model.js";
+import usersModel from "../dao/models/users.model.js";
+import UsersManager from "../controllers/usersControllers.js";
 import passport from "passport";
 
+const userManager = new UsersManager();
 const sessionRouter = Router();
 
 sessionRouter.use((req, res, next) => {
@@ -11,78 +13,38 @@ sessionRouter.use((req, res, next) => {
 
 const User = new usersModel();
 
-sessionRouter.get("/register", async (req, res) => {
-  res.render("register");
-});
-
 sessionRouter.post(
   "/register",
   passport.authenticate("register", {
     successRedirect: "/api/sessions/login",
     failureRedirect: "/api/sessions/failregister",
-  })
+  }),
+  userManager.registerUser
 );
 
+sessionRouter.post(
+  "/login",
+  passport.authenticate("login", {
+    failureRedirect: "/api/sessions/login",
+  }),
+  userManager.loginUser
+);
+
+sessionRouter.get("/logout", userManager.logoutUser);
+sessionRouter.get("/fullprofile", userManager.fullProfileUser);
+sessionRouter.get("/github", userManager.githubLogin);
+sessionRouter.get("/githubcallback", userManager.githubCallback);
+
+sessionRouter.get("/register", async (req, res) => {
+  res.render("register");
+});
+
 sessionRouter.get("/failregister", async (req, res) => {
-  res.render("failregister")
+  res.render("failregister");
 });
 
 sessionRouter.get("/login", async (req, res) => {
   res.render("login");
 });
-
-sessionRouter.post(
-  "/login",
-  passport.authenticate("login", { failureRedirect: "/api/sessions/login" }),
-  async (req, res) => {
-    if (!req.user) {
-      return res.status(400)({ status: "error", error: "Invalid credentials" });
-    }
-    req.session.user = {
-      first_name: req.user.first_name,
-      last_name: req.user.last_name,
-      age: req.user.age,
-      email: req.user.email,
-      role: req.user.role,
-    };
-    res.redirect("/api/products");
-  }
-);
-
-sessionRouter.get("/logout", async (req, res) => {
-  delete req.session.user;
-
-  res.redirect("/api/sessions/login");
-});
-
-sessionRouter.get("/fullprofile", async (req, res) => {
-  try {
-    if (!req.session.user) {
-      return res.redirect("/api/sessions/login");
-    }
-
-    const { first_name, last_name, email, role } = req.session.user;
-
-    res.render("fullProfile", { first_name, last_name, email, role });
-  } catch (error) {
-    console.log("err", error);
-    res.status(500).send("Server Error");
-  }
-});
-
-sessionRouter.get(
-  "/github",
-  passport.authenticate("github", { scope: ["user:email"] }),
-  async (req, res) => {}
-);
-
-sessionRouter.get(
-  "/githubcallback",
-  passport.authenticate("github", { failureRedirect: "/api/sessions/login" }),
-  async (req, res) => {
-    req.session.user = req.user;
-    res.redirect("/api/products");
-  }
-);
 
 export default sessionRouter;

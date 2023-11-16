@@ -6,30 +6,27 @@ import mongoose from "mongoose";
 import session from "express-session";
 import MongoStore from "connect-mongo";
 import FileStore from "session-file-store";
-import { config } from "dotenv";
 import passport from "passport";
 import initializePassport from "./config/passport.config.js";
 import Swal from "sweetalert2";
+
+import config from './config/config.js'
 
 import ProductRouter from "./router/product.routes.js";
 import cartRouter from "./router/cart.routes.js";
 import sessionRouter from "./router/sessions.routes.js";
 
-// Environment variable
-config();
-const mongoUrl = process.env.MONGO_URL;
 
 // Express
 const app = express();
-const PORT = 8080;
 const filestore = FileStore(session);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "/public")));
 
-const httpServer = app.listen(PORT, () => {
-  console.log(`Servidor en puerto ${PORT}`);
+const httpServer = app.listen(config.PORT, () => {
+  console.log(`Servidor en puerto ${config.PORT}`);
 });
 
 app.engine("handlebars", engine());
@@ -44,7 +41,7 @@ app.engine(
 // Mongoose
 const environment = async () => {
   await mongoose
-    .connect(mongoUrl)
+    .connect(config.mongoUrl)
     .then(() => {
       console.log("Connected to MongoDB");
     })
@@ -56,11 +53,11 @@ const environment = async () => {
 app.use(
   session({
     store: MongoStore.create({
-      mongoUrl: mongoUrl,
+      mongoUrl: config.mongoUrl,
       mongoOptions: { useNewUrlParser: true, useUnifiedTopology: true },
       ttl: 1000,
     }),
-    secret: process.env.SESSION_SECRET,
+    secret: config.sessionSecret,
     resave: true,
     saveUninitialized: false,
   })
