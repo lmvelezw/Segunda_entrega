@@ -25,6 +25,7 @@ class UsersManager {
         age: req.user.age,
         email: req.user.email,
         role: req.user.role,
+        cart: req.user.cart,
       };
 
       return res.redirect("/api/products");

@@ -1,4 +1,8 @@
 import cartsModel from "../models/carts.model.js";
+import Products from "./product.dao.js";
+import ticketModel from "../models/ticket.model.js";
+
+const products = new Products();
 
 class Carts {
   async getCarts() {
@@ -88,6 +92,7 @@ class Carts {
       if (!cartExists) {
         throw new Error("Cart not found");
       }
+
       cartExists.products = cartExists.products.filter(
         (prod) => prod.product.toString() !== pid
       );
@@ -100,6 +105,83 @@ class Carts {
       return res.status(500).send("Server Error");
     }
   }
+
+  async closedPurchase(cid) {
+    try {
+      let cartExists = await this.getCartByID(cid);
+      if (!cartExists) {
+        throw new Error("Cart not found");
+      }
+
+      let purchaseList = [];
+
+      for (const cartProduct of cartExists.products) {
+        let productId = cartProduct.product._id.toString();
+        let productCartQty = cartProduct.quantity;
+
+        let productData = await products.getProductByID(productId);
+        let productStock = productData[0].stock;
+        let productTitle = productData[0].title;
+        
+        if (!productData) {
+          throw new Error(`Product with ID ${productId} not found`);
+        }
+        
+        if (productCartQty <= productStock) {
+          purchaseList.push({
+            productId,
+            productCartQty,
+            productTitle,
+          });
+          let newQuantity = productStock - productCartQty;
+          
+          await products.updateProduct(productId, { stock: newQuantity });
+          await this.deleteProductInCart(cid, productId);
+        }
+      }
+      
+      if (purchaseList.length <= 0) {
+        return new Error("No items available for purchase");
+      }
+      
+      // let productPrice = productData[0].price
+      
+      // const createdTickets = [];
+      // for (const purchaseItem of purchaseList) {
+      //   const { productId, productCartQty, productTitle } = purchaseItem;
+        
+        
+      //   let ticketAmount = productPrice * productCartQty
+
+      //   let ticketData = {
+      //     code: 1,
+      //     purchase_datetime: new Date(),
+      //     amount: ticketAmount,
+      //     purchaser: req.session.user.email,
+      //   };
+
+      //   let newTicket = await ticketModel.create(ticketData);
+      //   createdTickets.push(newTicket);
+      // }
+
+      // console.log("Tickets created:", createdTickets);
+
+      return purchaseList;
+    } catch (error) {
+      console.error("Error:", error);
+      throw new Error("Failed to process purchase");
+    }
+  }
+
+//   async getPurchase() {
+//     try {
+//       let purchase = await ticketModel.findById();
+//       let purchaseInfo = purchase.toObject();
+//       return purchaseInfo;
+//     } catch (error) {
+//       console.log("err", error);
+//     }
+//   }
 }
 
 export default Carts;

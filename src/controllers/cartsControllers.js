@@ -1,6 +1,8 @@
 import Carts from "../dao/classes/carts.dao.js";
+import Products from "../dao/classes/product.dao.js";
 
 const carts = new Carts();
+const products = new Products();
 
 class CartManager {
   constructor() {}
@@ -18,8 +20,9 @@ class CartManager {
   async getCartByID(req, res) {
     let { id } = req.params;
     try {
-      let cartsInfo = carts.getCartByID(id);
-      return res.render("cartProducts", { cartsInfo });
+      let cartsInfo = await carts.getCartByID(id);
+      let cart = req.session.user.cart.toString();
+      return res.render("cartProducts", { cartsInfo, cart });
     } catch (error) {
       console.log("err", error);
       return res.status(500).send("Server Error");
@@ -50,10 +53,7 @@ class CartManager {
 
       let updatedCart = await carts.createProductInCart(cid, pid, quantity);
 
-      return res.send({
-        result: "success",
-        payload: updatedCart,
-      });
+      return res.redirect("/api/products");
     } catch (error) {
       console.log("err", error.message);
       return res.status(500).send("Server Error");
@@ -79,7 +79,7 @@ class CartManager {
   async deleteCart(req, res) {
     try {
       let { id } = req.params;
-      let result = carts.deleteCart(id);
+      let result = await carts.deleteCart(id);
       return res.send({ result: "success", payload: result });
     } catch (error) {
       console.log("err", error);
@@ -100,12 +100,33 @@ class CartManager {
 
       let updatedCart = await carts.deleteProductInCart(cid, pid);
 
-      return res.send({ status: "success", payload: updatedCart });
+      return res.send({ result: "success", payload: updatedCart });
     } catch (error) {
       console.log("err", error);
       return res.status(500).send("Server Error");
     }
   }
+
+  async closedPurchase(req, res) {
+    try {
+      let { cid } = req.params;
+
+      let result = await carts.closedPurchase(cid);
+      return res.send({ result: "success", payload: result });
+    } catch (error) {
+      console.log("err", error);
+      return res.status(500).send("Server Error");
+    }
+  }
+  // async readClosedPurchase(req, res) {
+  //   try {
+  //     let purchase = await carts.getPurchase();
+  //     return res.render("purchase", purchase);
+  //   } catch (error) {
+  //     console.log("err", error);
+  //     return res.status(500).send("Server Error");
+  //   }
+  // }
 }
 
 export default CartManager;

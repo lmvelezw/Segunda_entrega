@@ -45,8 +45,8 @@ class Products {
     }
   }
 
-  async getProductByID(req) {
-    let { id } = req.params;
+  async getProductByID(id) {
+    // let id  = req.params;
     try {
       let product = await productModel.find({ _id: id });
       return product;
@@ -77,9 +77,9 @@ class Products {
     }
   }
 
-  async updateProduct(req, updateProduct) {
+  async updateProduct(id, updateProduct) {
     try {
-      let { id } = req.params;
+      // let { id } = req.params;
       let result = await productModel.updateOne({ _id: id }, updateProduct);
       return result;
     } catch (error) {

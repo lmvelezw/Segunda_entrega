@@ -6,18 +6,30 @@
   </head>
   <body>
 
-    <h2>Productos del carrito</h2>
+    <h2>Cart products</h2>
+    <a href="/api/products">Back to products</a>
 
     {{#each cartsInfo.products}}
-      <li>
+      <ul>
         <h3>{{product.title}}</h3>
-        <p>{{product.description}}</p>
-        <p>{{product.code}}</p>
-        <p>${{product.price}}</p>
-        <p>{{product.category}}</p>
-        <p>{{quantity}}</p>
-      </li>
+        <li>{{product.description}}</li>
+        <li>{{product.code}}</li>
+        <li>${{product.price}}</li>
+        <li>{{product.category}}</li>
+        <li>{{quantity}}</li>
+      </ul>
+
+      <a href="#" class="delete-product" data-product-id="{{product._id}}" data-cart-id="{{../cart}}">
+        <span class="material-symbols-outlined">
+          delete
+        </span>
+      </a>
+
     {{/each}}
+
+    <a href="#" class="deleteAllItems" data-cart-id="{{cart}}">Delete all items</a>
+
+    <a href="/api/cart/{{cart}}/purchase" >Finalizar compra</a>
 
   </body>
 </html>

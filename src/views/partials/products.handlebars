@@ -8,33 +8,46 @@
 
     <h1>Products</h1>
 
-    {{#each productsInfo.docs}}
-      <div class="product">
-        <ul>
+      {{#each productsInfo.docs}}
+        <div class="product">
+          <ul>
 
-          <h2>{{this.title}}</h2>
-          <li>{{this.description}}</li>
-          <li>{{this.code}}</li>
-          <li>{{this.price}}</li>
-          <li>{{this.category}}</li>
-          <p>Price: ${{this.price}}</p>
-        </ul>
+            <h2>{{this.title}}</h2>
+            <li>{{this.description}}</li>
+            <li>{{this.code}}</li>
+            <li>{{this.price}}</li>
+            <li>{{this.category}}</li>
+            <p>Price: ${{this.price}}</p>
+          </ul>
 
-        <form action="/cart/:cid/product/:pid" method="put">
-          <input type="number" name="quantity" value="1" />
-          <button type="submit" id="addProduct">Agregar al carrito</button>
-        </form>
+          <form
+            action="/api/cart/{{../user.cart}}/product/{{this._id}}"
+            method="post"
+          >
+            <input type="number" name="quantity" value="1" />
+            <button type="submit" id="addProduct">Agregar al carrito</button>
+          </form>
 
-      </div>
+        </div>
 
-    {{/each}}
+      {{/each}}
 
-{{#if productsInfo.hasPrevPage}}
-  <a href="/api/products?{{generatePrevPageLink query productsInfo.prevPage}}">Previous Page</a>
-{{/if}}
-{{#if productsInfo.hasNextPage}}
-  <a href="/api/products?{{generateNextPageLink query productsInfo.nextPage}}">Next Page</a>
-{{/if}}
+    {{#if productsInfo.hasPrevPage}}
+      <a
+        href="/api/products?{{generatePrevPageLink
+          query
+          productsInfo.prevPage
+        }}"
+      >Previous Page</a>
+    {{/if}}
+    {{#if productsInfo.hasNextPage}}
+      <a
+        href="/api/products?{{generateNextPageLink
+          query
+          productsInfo.nextPage
+        }}"
+      >Next Page</a>
+    {{/if}}
 
   </body>
 </html>

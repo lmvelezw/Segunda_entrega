@@ -2,6 +2,7 @@ import { Router } from "express";
 import handlebars from "handlebars";
 import { URLSearchParams } from "url";
 import ProductManager from "../controllers/productControllers.js";
+import { checkAccess } from "../controllers/accessControl.js";
 
 const productManager = new ProductManager();
 
@@ -32,8 +33,12 @@ handlebars.registerHelper("generatePrevPageLink", (query, prevPage) => {
 // http://localhost:8080/api/products?category=Mesa&limit=1&sort=asc&page=2
 ProductRouter.get("/", productManager.getAllProducts);
 ProductRouter.get("/:id", productManager.getProductByID);
-ProductRouter.post("/", productManager.createProduct);
-ProductRouter.put("/:id", productManager.updateProduct);
-ProductRouter.delete("/:id", productManager.deleteProduct);
+ProductRouter.post("/", checkAccess(["admin"]), productManager.createProduct);
+ProductRouter.put("/:id", checkAccess(["admin"]), productManager.updateProduct);
+ProductRouter.delete(
+  "/:id",
+  checkAccess(["admin"]),
+  productManager.deleteProduct
+);
 
 export default ProductRouter;
