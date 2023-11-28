@@ -7,11 +7,6 @@ const ticketSchema = new mongoose.Schema({
   purchase_datetime: Date,
   amount: Number,
   purchaser: String,
-  password: String,
-  role: {
-    type: mongoose.Types.ObjectId,
-    ref: "users",
-  },
 });
 
 const ticketModel = mongoose.model(ticketCollection, ticketSchema);

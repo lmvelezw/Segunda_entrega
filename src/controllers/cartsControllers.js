@@ -111,7 +111,7 @@ class CartManager {
     try {
       let { cid } = req.params;
 
-      let result = await carts.closedPurchase(cid);
+      let result = await carts.closedPurchase(cid, req);
       return res.send({ result: "success", payload: result });
     } catch (error) {
       console.log("err", error);
