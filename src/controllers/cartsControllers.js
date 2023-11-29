@@ -1,5 +1,17 @@
 import Carts from "../dao/classes/carts.dao.js";
 import Products from "../dao/classes/product.dao.js";
+import config from '../config/config.js'
+import nodemailer from 'nodemailer'
+
+//Nodemailer
+const transport = nodemailer.createTransport({
+  service: "gmail",
+  port: 8080,
+  auth:{
+    user: config.gmailUser,
+    pass: config.gmailPass
+  }
+})
 
 const carts = new Carts();
 const products = new Products();
@@ -110,8 +122,18 @@ class CartManager {
   async closedPurchase(req, res) {
     try {
       let { cid } = req.params;
+      let user = req.session.user.email.toString()
 
       let result = await carts.closedPurchase(cid, req);
+
+      await transport.sendMail({
+        from: config.gmailUser,
+        to: user,
+        subject: `Ticket de compra`,
+        text: JSON.stringify(result),
+      })
+
+
       return res.send({ result: "success", payload: result });
     } catch (error) {
       console.log("err", error);

@@ -9,6 +9,8 @@ export default{
     githubSecret: process.env.GITHUB_SECRET,
     githubCallback: process.env.GITHUB_CALLBACK_URL,
     sessionSecret: process.env.SESSION_SECRET,
-    PORT: process.env.PORT
+    PORT: process.env.PORT,
+    gmailUser: process.env.GMAIL_USER,
+    gmailPass: process.env.GMAIL_PASS,
 
 }
