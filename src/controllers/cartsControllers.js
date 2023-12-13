@@ -2,6 +2,9 @@ import Carts from "../dao/classes/carts.dao.js";
 import Products from "../dao/classes/product.dao.js";
 import config from '../config/config.js'
 import nodemailer from 'nodemailer'
+import customError from "../services/errors/CustomError.js"
+
+const specificError = new customError()
 
 //Nodemailer
 const transport = nodemailer.createTransport({
@@ -37,6 +40,7 @@ class CartManager {
       return res.render("cartProducts", { cartsInfo, cart });
     } catch (error) {
       console.log("err", error);
+      specificError({statusCode: 500, causeKey: 'SERVER_ERROR', message: 'Error occurred while fetching carts' })
       return res.status(500).send("Server Error");
     }
   }

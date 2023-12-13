@@ -14,6 +14,7 @@ import config from './config/config.js'
 import ProductRouter from "./router/product.routes.js";
 import cartRouter from "./router/cart.routes.js";
 import sessionRouter from "./router/sessions.routes.js";
+import { addLogger, logTestMessages } from "./utils/logger.js";
 
 
 // Express
@@ -83,4 +84,9 @@ app.use(
 
 app.get("/", (req, res) => {
   res.redirect("/api/sessions/login");
+});
+
+app.get("/loggerTest", addLogger, (req, res) => {
+  logTestMessages(req.logger);
+  res.send("Logging test messages at different levels");
 });
