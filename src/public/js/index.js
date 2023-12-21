@@ -23,28 +23,28 @@ document.querySelectorAll(".delete-product").forEach((button) => {
   });
 });
 
-document.querySelector('.deleteAllItems').addEventListener('click', async () => {
-    const button = document.querySelector('.deleteAllItems');
+document
+  .querySelector(".deleteAllItems")
+  .addEventListener("click", async () => {
+    const button = document.querySelector(".deleteAllItems");
     const cartId = button.dataset.cartId;
 
-    console.log("carroeliminar", cartId)
-  
+    console.log("carroeliminar", cartId);
+
     try {
       const response = await fetch(`/api/cart/${cartId}`, {
-        method: 'DELETE',
+        method: "DELETE",
         headers: {
-          'Content-Type': 'application/json'
-        }
+          "Content-Type": "application/json",
+        },
       });
-  
+
       if (response.ok) {
         window.location.reload();
       } else {
-        console.error('Failed to delete all items');
+        console.error("Failed to delete all items");
       }
     } catch (error) {
-      console.error('Error:', error);
+      console.error("Error:", error);
     }
   });
-  
-  

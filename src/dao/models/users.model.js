@@ -9,6 +9,8 @@ const userSchema = new mongoose.Schema({
   age: Number,
   password: String,
   role: String,
+  resetPasswordToken: String,
+  resetPasswordExpires: Date,
   cart: {
     type: mongoose.Types.ObjectId,
     ref: "carts",

@@ -1,0 +1,19 @@
+<div class="formsContainer">
+  <h2>Change your role here</h2>
+
+  <form
+    class="form"
+    method="POST"
+    action="/api/sessions/premium/{{userId}}"
+    id="roleForm"
+  >
+    <label for="role">Role</label>
+    <select class="input" name="role" id="role">
+      <option value="user" selected>User</option>
+      <option value="premium">Premium</option>
+      <option value="admin">Admin</option>
+    </select>
+    <button class="btn btnproceed" type="submit">Update your role</button>
+  </form>
+
+</div>

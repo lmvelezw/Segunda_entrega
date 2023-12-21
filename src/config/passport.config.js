@@ -29,6 +29,7 @@ const initializePassport = () => {
             cart: null,
           };
           let result = await userModel.create(newUser);
+          req.session.user = { email: email, role: role }
 
           let newCart = await cartsModel.create({});
           result.cart = newCart._id;

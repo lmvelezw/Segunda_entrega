@@ -57,6 +57,12 @@ class Products {
   async createProduct(req) {
     let { title, description, code, price, stock, category, image } = req.body;
 
+    if (req.session.user.role !== "premium" || req.session.user.role !== "admin") {
+      throw new Error("User has no permissions");
+    }
+
+    const owner = req.session.user ? req.session.user.email : "admin";
+
     if (!title || !description || !code || !price || !stock || !category) {
       throw new Error("Incomplete data");
     }
@@ -69,6 +75,7 @@ class Products {
         stock,
         category,
         image,
+        owner,
       });
       return result;
     } catch (error) {
@@ -87,9 +94,17 @@ class Products {
 
   async deleteProduct(req) {
     let { id } = req.params;
+    const { role, email } = req.session.user;
+    let product = await productModel.findById(id);
+    let owner = product.owner;
+
     try {
-      let result = await productModel.deleteOne({ _id: id });
-      return result;
+      if (role === "admin" || (role === "premium" && email === owner)) {
+        let result = await productModel.deleteOne({ _id: id });
+        return result;
+      } else {
+        throw new Error("Unauthorized to delete this product");
+      }
     } catch (error) {
       console.log("err", error);
     }

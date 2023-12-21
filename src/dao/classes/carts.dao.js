@@ -36,6 +36,14 @@ class Carts {
 
   async createProductInCart(cid, pid, quantity) {
     try {
+      const { role, email } = req.session.user;
+      let product = await productModel.findById(pid);
+      let owner = product.owner;
+
+      if (role === "premium" && email === owner){
+        throw new Error("You can't add your own product to the shopping cart!");
+      }
+
       let updatedCart = await cartsModel.findOneAndUpdate(
         { _id: cid, "products.product": pid },
         { $inc: { "products.$.quantity": parseInt(quantity) } },
@@ -154,8 +162,7 @@ class Carts {
         totalAmount += purchaseItem.totalPricePerProduct;
       }
 
-      let user = req.session.user.email.toString()
-
+      let user = req.session.user.email.toString();
 
       const consolidatedTicketData = {
         code: nanoid(),
