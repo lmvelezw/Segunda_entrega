@@ -8,6 +8,8 @@ import MongoStore from "connect-mongo";
 import FileStore from "session-file-store";
 import passport from "passport";
 import initializePassport from "./config/passport.config.js";
+import swaggerJSDoc from "swagger-jsdoc";
+import swaggerUiExpress from 'swagger-ui-express'
 
 import config from './config/config.js'
 
@@ -36,9 +38,24 @@ app.use("/", express.static(__dirname + "/public"));
 app.engine(
   "handlebars",
   engine({ partialsDir: __dirname + "/views/partials" })
-);
-
-// Mongoose
+  );
+  
+  //Swagger
+  const swaggerOptions = {
+    definition: {
+      openapi:'3.0.1',
+      info:{
+        title:"Store App documentation",
+        description:"Coder Backend delivery"
+      }
+    },
+    apis:[`${__dirname}/docs/**/*.yaml`]
+  }
+  
+  const specs = swaggerJSDoc(swaggerOptions)
+  app.use('/apidocs', swaggerUiExpress.serve,swaggerUiExpress.setup(specs))
+  
+  // Mongoose
 const environment = async () => {
   await mongoose
     .connect(config.mongoUrl)
