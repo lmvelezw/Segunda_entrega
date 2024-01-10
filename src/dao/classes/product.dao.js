@@ -57,7 +57,10 @@ class Products {
   async createProduct(req) {
     let { title, description, code, price, stock, category, image } = req.body;
 
-    if (req.session.user.role !== "premium" || req.session.user.role !== "admin") {
+    if (
+      req.session.user.role !== "premium" &&
+      req.session.user.role !== "admin"
+    ) {
       throw new Error("User has no permissions");
     }
 
