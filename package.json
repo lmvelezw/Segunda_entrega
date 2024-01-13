@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "nodemon src/index.js",
-    "test": "mocha ./test/Products.test.js"
+    "test": "mocha --timeout 10000 ./test/Products.test.js"
   },
   "author": "",
   "license": "ISC",
@@ -28,6 +28,7 @@
     "passport-github2": "^0.1.12",
     "passport-local": "^1.0.0",
     "session-file-store": "^1.5.0",
+    "supertest": "^6.3.3",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.0",
     "sweetalert2": "^11.7.32",

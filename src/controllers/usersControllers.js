@@ -74,8 +74,7 @@ class UsersManager {
         return res.redirect("/api/sessions/login");
       }
 
-      const {userId, first_name, last_name, email, role } = req.session.user;
-
+      const { userId, first_name, last_name, email, role } = req.session.user;
 
       return res.render("fullProfile", {
         userId,
@@ -145,19 +144,18 @@ class UsersManager {
     }
   }
 
-  async changeUserRole(req,res) {
+  async changeUserRole(req, res) {
     try {
       let userId = req.session.user.userId;
-      return res.render("roleChange", { userId })
+      return res.render("roleChange", { userId });
     } catch (error) {
       console.log("err", error);
       return res.status(500).send("Server Error");
     }
   }
-  
+
   async updateUserRole(req, res) {
     try {
-      
       if (!req.user || !req.user._id) {
         return res.status(400).send("User ID not found");
       }
