@@ -37,6 +37,10 @@ app.use(
     saveUninitialized: false,
   })
 );
+
+// Multer
+app.use(express.static(path.join(__dirname, "public")));
+
 // Passport
 app.use(passport.initialize());
 app.use(passport.session());

@@ -1,11 +1,7 @@
 import mongoose from "mongoose";
 import Products from "../src/dao/classes/product.dao.js";
-import supertest from "supertest";
 import Assert from "assert";
 import { config } from "dotenv";
-import Carts from "../src/dao/classes/carts.dao.js";
-import app from "../src/index.js";
-import userModel from "../src/dao/models/users.model.js";
 import * as chai from "chai";
 
 const expect = chai.expect;
@@ -16,9 +12,7 @@ const mongoUrl = process.env.MONGO_URL;
 
 await mongoose
   .connect(mongoUrl)
-  .then(() => {
-    console.log("Connected to MongoDB");
-  })
+  .then(() => {})
   .catch((error) => {
     throw Error(`Error connecting to database ${error}`);
   });
@@ -72,82 +66,6 @@ describe("Test Products dao", () => {
     } catch (error) {
       console.log("Error retrieving data: ", error);
       assert.fail("Missed test");
-    }
-  });
-});
-
-describe("Test Carts dao", () => {
-  before(function () {
-    this.cartsDao = new Carts();
-  });
-  beforeEach(function () {
-    this.timeout(5000);
-  });
-
-  it("Dao creates a cart in the database", async function () {
-    const req = {
-      products: [],
-    };
-
-    const createdCart = await this.cartsDao.createCart(req);
-    assert.ok(createdCart._id);
-  });
-
-  it("Dao deletes a cart in the database", async function () {
-    const req = {
-      products: [],
-    };
-
-    const createdCart = await this.cartsDao.createCart(req);
-    assert.ok(createdCart._id);
-
-    const cartAfterDeletion = await this.cartsDao.getCartByID(createdCart._id);
-    assert.strict(cartAfterDeletion, null);
-  });
-});
-
-describe("User Registration", () => {
-  beforeEach(async () => {
-    // Clear the users collection before each test
-    await userModel.deleteMany();
-  });
-
-  it("should register a new user", async () => {
-    const newUser = {
-      first_name: "John",
-      last_name: "Doe",
-      email: "john.doe@example.com",
-      age: 25,
-      role: "user",
-      password: "password123",
-    };
-
-    try {
-      const res = await supertest(app)
-        .post("/api/sessions/register")
-        .send(newUser)
-        .expect(302)
-        .expect("Location", "/api/sessions/login");
-
-      // console.log("Response Body:", res.body);
-      // // Perform assertions for successful registration
-      // expect(res.body.user).to.have.property("_id");
-
-      // // Query the database to check if the user was created
-      // const registeredUser = await userModel.findOne({
-      //   email: newUser.email,
-      // });
-
-      // Assert that the user is not null (i.e., user exists in the database)
-      // expect(registeredUser).to.not.be.null;
-
-      // Additional assertions based on your user creation logic
-      // expect(registeredUser.first_name).to.equal(newUser.first_name);
-      // expect(registeredUser.role).to.equal(newUser.role);
-    } catch (error) {
-      // Handle errors, log them, etc.
-      console.error("Error in user registration test:", error);
-      throw error; // Re-throw the error to make the test fail
     }
   });
 });

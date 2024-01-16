@@ -3,6 +3,8 @@ import Users from "../dao/classes/users.dao.js";
 import nodemailer from "nodemailer";
 import userModel from "../dao/models/users.model.js";
 import crypto from "crypto";
+import multer from "multer";
+import passport from "passport";
 
 const usersDao = new Users();
 
@@ -16,6 +18,22 @@ const transport = nodemailer.createTransport({
 });
 
 class UsersManager {
+  storageDocuments = multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, "uploads/documents");
+    },
+    filename: (req, file, cb) => {
+      const timestamp = Date.now();
+      const originalName = file.originalName;
+      cb(null, `${timestamp} ${originalName}`);
+    },
+  });
+
+  uploadDocuments = multer({
+    storage: this.storageDocuments,
+    limits: { files: 3 },
+  }).array("documents", 3);
+
   constructor() {}
 
   async registerUser(req, res) {
@@ -45,6 +63,12 @@ class UsersManager {
         role: req.user.role,
         cart: req.user.cart,
       };
+
+      const currentTime = Date.now();
+      let userId = req.user._id;
+      await userModel.findByIdAndUpdate(userId, {
+        lastConnection: currentTime,
+      });
 
       return res.redirect("/api/products");
     } catch (error) {
@@ -154,19 +178,125 @@ class UsersManager {
     }
   }
 
+  // async updateUserRole(req, res) {
+  //   try {
+
+  //     if (!req.user || !req.user._id) {
+  //       return res.status(400).send("User ID not found");
+  //     }
+  //     console.log("files", req.files);
+
+  //     if (req.files && req.files.length !== 3) {
+  //       return res
+  //         .status(400)
+  //         .send("Please upload three documents for role update.");
+  //     }
+  //     this.uploadDocuments(req, res, async (err) => {
+  //       if (err) {
+  //         console.error("Error uploading documents:", err);
+
+  //         return res.status(400).send("Error uploading documents.");
+  //       }
+  //       console.log("Uploaded documents:", req.files);
+
+  //       let newRole = req.body.role;
+  //       let userId = req.session.user.userId;
+
+  //       const updatedUser = await usersDao.updateUserRole(userId, newRole);
+  //       console.log("User role updated:", updatedUser);
+
+  //       return res.redirect("/");
+  //     });
+  //   } catch (error) {
+  //     console.log("err", error);
+  //     return res.status(500).send("Server Error");
+  //   }
+  // }
   async updateUserRole(req, res) {
     try {
+      console.log("Entered updateUserRole");
+
       if (!req.user || !req.user._id) {
         return res.status(400).send("User ID not found");
       }
-      let newRole = req.body.role;
-      let userId = req.session.user.userId;
 
-      // console.log(newRole);
-      // console.log(userId);
-      const updatedUser = await usersDao.updateUserRole(userId, newRole);
+      console.log("files", req.files);
 
-      return res.redirect("/");
+      if (req.files && req.files.length !== 3) {
+        return res
+          .status(400)
+          .send("Please upload three documents for role update.");
+      }
+
+      this.uploadDocuments(req, res, async (err) => {
+        if (err) {
+          console.error("Error uploading documents:", err);
+          return res.status(400).send("Error uploading documents.");
+        }
+
+        console.log("Uploaded documents:", req.files);
+
+        let newRole = req.body.role;
+        let userId = req.session.user.userId;
+
+        // Pass the uploaded files to updateUserRole
+        const updatedUser = await usersDao.updateUserRole(
+          userId,
+          newRole,
+          req.files
+        );
+
+        console.log("User role updated:", updatedUser);
+
+        return res.redirect("/");
+      });
+    } catch (error) {
+      console.log("err", error);
+      return res.status(500).send("Server Error");
+    }
+  }
+
+  async uploadDocument(req, res) {
+    try {
+      const storageProfilePic = multer.diskStorage({
+        destination: (req, file, cb) => {
+          cb(null, "uploads/profiles");
+        },
+        filename: (req, file, cb) => {
+          const timestamp = Date.now();
+          const originalName = file.originalName;
+          const ext = path.extname(originalName);
+          cb(null, `${timestamp} ${originalName}`);
+        },
+      });
+
+      const uploadProfilePic = multer({ storage: storageProfilePic });
+
+      const storageProductPic = multer.diskStorage({
+        destination: (req, file, cb) => {
+          cb(null, "uploads/products");
+        },
+        filename: (req, file, cb) => {
+          const timestamp = Date.now();
+          const originalName = file.originalName;
+          const ext = path.extname(originalName);
+          cb(null, `${timestamp} ${originalName}`);
+        },
+      });
+
+      const uploadProductPic = multer({ storage: storageProductPic });
+
+      const storageDocuments = multer.diskStorage({
+        destination: (req, file, cb) => {
+          cb(null, "uploads/documents");
+        },
+        filename: (req, file, cb) => {
+          const timestamp = Date.now();
+          const originalName = file.originalName;
+          const ext = path.extname(originalName);
+          cb(null, `${timestamp} ${originalName}`);
+        },
+      });
     } catch (error) {
       console.log("err", error);
       return res.status(500).send("Server Error");

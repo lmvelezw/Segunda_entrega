@@ -49,9 +49,13 @@ sessionRouter.get("/login", async (req, res) => {
   res.render("login");
 });
 
-sessionRouter.get("/premium/:userId",userManager.changeUserRole);
+sessionRouter.get("/premium/:userId", userManager.changeUserRole);
 
-sessionRouter.post("/premium/:userId", userManager.updateUserRole);
+sessionRouter.post(
+  "/premium/:userId",
+  userManager.uploadDocuments,
+  userManager.updateUserRole
+);
 
 sessionRouter.get("/passrecover/:token", async (req, res) => {
   try {
@@ -114,10 +118,7 @@ sessionRouter.post(
   }
 );
 
-
-
-// testtttt
-
-sessionRouter.get("/testpage", userManager.updateUserRole);
+sessionRouter.post("/userId/documents", userManager.uploadDocument);
+// sessionRouter.get("/testpage", userManager.updateUserRole);
 
 export default sessionRouter;

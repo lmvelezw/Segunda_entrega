@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "nodemon src/index.js",
-    "test": "mocha --timeout 10000 ./test/Products.test.js"
+    "test": "mocha --timeout 10000 ./test/*.test.js"
   },
   "author": "",
   "license": "ISC",
@@ -21,6 +21,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^7.6.0",
     "mongoose-paginate-v2": "^1.7.4",
+    "multer": "^1.4.5-lts.1",
     "nanoid": "^5.0.3",
     "nodemailer": "^6.9.7",
     "nodemon": "^3.0.1",
